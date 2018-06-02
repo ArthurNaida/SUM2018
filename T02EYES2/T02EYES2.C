@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <math.h>
 #define WND_CLASS_NAME "My window class"
 
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
@@ -46,9 +47,27 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 
 
 
+
   return msg.wParam;
 }
 
+VOID DrawEye(HDC hDC, INT x, INT y, INT r, INT r1, INT Mx, INT My)
+{
+  INT alp = arctan(abs((x - Mx) / (y - My)));
+
+  SelectObject(hDC, GetStockObject(DC_PEN));
+  SelectObject(hDC, GetStockObject(DC_BRUSH));
+
+  SetDCPenColor(hDC, RGB(0, 0, 0));
+  SetDCBrushColor(hDC, RGB(255, 255, 255));
+
+  Ellipse(hDC, x - r, y - r, x + r, y + r);
+
+  SetDCPenColor(hDC, RGB(0, 0, 0));
+  SetDCBrushColor(hDC, RGB(0, 0, 0));
+
+  Ellipse(hDC, x + r, y + r, 2 * r + x, 2 * r + y);
+}
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   POINT pt;
@@ -71,15 +90,9 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
     hDC = GetDC(hWnd);
     GetClientRect(hWnd, &rc);
 
+    DrawEye(hDC, 200, 200, 100, 50, pt.x, pt.y);
+
     
-
-    SelectObject(hDC, GetStockObject(DC_PEN));
-    SelectObject(hDC, GetStockObject(DC_BRUSH));
-
-    SetDCPenColor(hDC, RGB(0, 0, 0));
-    SetDCBrushColor(hDC, RGB(100, 100, 100));
-
-    Ellipse(hDC, 0,0, rc.right, rc.bottom);
 
     ReleaseDC(hWnd, hDC);
     return 0;
@@ -90,18 +103,8 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
-void DrawEye(HDC hDC, INT x, INT y, INT r, INT r1, INT mx, INT my)
-{
 
-  SelectObject(hDC, GetStockObject(DC_PEN));
-  SelectObject(hDC, GetStockObject(DC_BRUSH));
 
-  SetDCPenColor(hDC, RGB(0, 0, 0));
-  SetDCBrushColor(hDC, RGB(50, 50, 50));
-
-  Ellipse(hDC, 20, 20, 50, 50 );
-
-}
 
 
 
