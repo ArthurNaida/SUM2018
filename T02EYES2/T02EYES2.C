@@ -24,7 +24,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 
   if (!RegisterClass(&wc))
   {
-    MessageBox(NULL, "Error register window class", "ERROR", MB_OK);
+    MessageBox(NULL, "Error", "ERROR", MB_OK);
     return 0;
   }
 
@@ -45,15 +45,13 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     DispatchMessage(&msg);
   }
 
-
-
-
   return msg.wParam;
 }
 
 VOID DrawEye(HDC hDC, INT x, INT y, INT r, INT r1, INT Mx, INT My)
 {
-  INT alp = arctan(abs((x - Mx) / (y - My)));
+  DOUBLE dx = ((r - r1) * (Mx - x)) / (sqrt((Mx - x) * (Mx - x) + (My - y) * (My - y)));
+  DOUBLE dy = ((r - r1) * (My - y)) / (sqrt((Mx - x) * (Mx - x) + (My - y) * (My - y)));
 
   SelectObject(hDC, GetStockObject(DC_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
@@ -62,17 +60,30 @@ VOID DrawEye(HDC hDC, INT x, INT y, INT r, INT r1, INT Mx, INT My)
   SetDCBrushColor(hDC, RGB(255, 255, 255));
 
   Ellipse(hDC, x - r, y - r, x + r, y + r);
+  
+  if (sqrt((Mx - x) * (Mx - x) + (My - y) * (My - y)) < (r - r1))
+  {
+    SetDCPenColor(hDC, RGB(0, 0, 0));
+    SetDCBrushColor(hDC, RGB(0, 0, 0));
 
-  SetDCPenColor(hDC, RGB(0, 0, 0));
-  SetDCBrushColor(hDC, RGB(0, 0, 0));
+    Ellipse(hDC, Mx - r1, My - r1, Mx + r1, My + r1);
+  }
+  else
+  {
+    SetDCPenColor(hDC, RGB(0, 0, 0));
+    SetDCBrushColor(hDC, RGB(0, 0, 0));
 
-  Ellipse(hDC, x + r, y + r, 2 * r + x, 2 * r + y);
+    Ellipse(hDC, dx + x - r1, dy + y - r1, dx + x + r1, dy + y + r1);
+  }
 }
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   POINT pt;
-  RECT rc;
+  PAINTSTRUCT ps;
+  static INT w, h;
   HDC hDC;
+  static HDC hMemDC;
+  static HBITMAP hBm;
 
   GetCursorPos(&pt);
   ScreenToClient(hWnd, &pt);
@@ -80,31 +91,62 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   switch (Msg)
   {
   case WM_CREATE:
-    SetTimer(hWnd, 15, 30, NULL);
+    hDC = GetDC(hWnd);
+	hMemDC = CreateCompatibleDC(hDC);
+	ReleaseDC(hWnd, hDC);
+	SetTimer(hWnd, 15, 10, NULL);
+
     return 0;
+  
+  case WM_SIZE:
+    h = HIWORD(lParam);
+    w = LOWORD(lParam);
+	
+	if (hBm != NULL)
+	  DeleteObject(hBm);
+    
+	hDC = GetDC(hWnd);
+	hBm = CreateCompatibleBitmap(hDC, w, h);
+	ReleaseDC(hWnd, hDC);
+	SelectObject(hMemDC, hBm);
+
+	GetCursorPos(&pt);
+    ScreenToClient(hWnd, &pt);
+	
+	DrawEye(hDC, w / 4, h / 2, 200, 100, pt.x, pt.y);
+    DrawEye(hDC, w * 3 / 4, h / 2, 200, 100, pt.x, pt.y);
+
+	return 0;
+  
+  case WM_LBUTTONDOWN:
+    InvalidateRect(hWnd, NULL, FALSE);
+	return 0;
 
   case WM_TIMER:
     GetCursorPos(&pt);
     ScreenToClient(hWnd, &pt);
 
-    hDC = GetDC(hWnd);
-    GetClientRect(hWnd, &rc);
+	InvalidateRect(hWnd, NULL, FALSE);
 
-    DrawEye(hDC, 200, 200, 100, 50, pt.x, pt.y);
+    return 0;
 
-    
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+	BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+	EndPaint(hWnd, &ps);
 
-    ReleaseDC(hWnd, hDC);
+	return 0;
+
+  case WM_ERASEBKGND:
     return 0;
 
   case WM_DESTROY:
-    PostQuitMessage(0);
+    DeleteObject(hBm);
+	DeleteDC(hMemDC);
+	KillTimer(hWnd, 15);
+	PostQuitMessage(0);
+
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
-
-
-
-
-
