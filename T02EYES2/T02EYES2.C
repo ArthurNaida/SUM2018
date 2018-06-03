@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <math.h>
+#include <time.h>
 #define WND_CLASS_NAME "My window class"
 
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
@@ -113,18 +114,15 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
 	GetCursorPos(&pt);
     ScreenToClient(hWnd, &pt);
 	
-	DrawEye(hDC, w / 4, h / 2, 200, 100, pt.x, pt.y);
-    DrawEye(hDC, w * 3 / 4, h / 2, 200, 100, pt.x, pt.y);
-
 	return 0;
   
-  case WM_LBUTTONDOWN:
-    InvalidateRect(hWnd, NULL, FALSE);
-	return 0;
-
   case WM_TIMER:
     GetCursorPos(&pt);
     ScreenToClient(hWnd, &pt);
+
+	DrawEye(hMemDC, w / 4, h / 2, 200, 100, pt.x, pt.y);
+    DrawEye(hMemDC, w * 3 / 4, h / 2, 200, 100, pt.x, pt.y);
+	
 
 	InvalidateRect(hWnd, NULL, FALSE);
 
@@ -149,4 +147,3 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
-}
