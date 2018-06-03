@@ -147,3 +147,4 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
+}
