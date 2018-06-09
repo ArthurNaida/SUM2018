@@ -4,15 +4,12 @@
 #include <time.h>
 #define WND_CLASS_NAME "My window class"
 #define PI 3.14159265358979323846
-#define N 10
-#define M 12
+#define N 27
+#define M 30
 
 INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
-typedef struct
-{
-  DOUBLE x, y, z;
-} VEC;
+
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd)
 {
@@ -37,7 +34,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
     return 0;
   }
 
-  hWnd = CreateWindow(WND_CLASS_NAME, "CLOCK",
+  hWnd = CreateWindow(WND_CLASS_NAME, "SPHERE",
     WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT, CW_USEDEFAULT,
     CW_USEDEFAULT, CW_USEDEFAULT,
@@ -77,7 +74,7 @@ VECT RotateZ( VECT v, DOUBLE angle )
 
 VECT RotateY( VECT v, DOUBLE angle )
 {
-  return VecCor(v.z * sin(angle * PI / 180) + v.x * cos(angle * PI / 180), v.y, v.z * cos(angle * PI / 180) - v.y * sin(angle * PI / 180));
+  return VecCor(v.z * sin(angle * PI / 180) + v.x * cos(angle * PI / 180), v.y, v.z * cos(angle * PI / 180) - v.x * sin(angle * PI / 180));
 }
 
 VOID MakeSphere( INT r )
@@ -87,7 +84,7 @@ VOID MakeSphere( INT r )
   for (i = 0; i < N; i++)
   {
     DOUBLE te = i * PI / N;
-    for (j = 0; j < M - 1; j++)
+    for (j = 0; j < M; j++)
     {
       DOUBLE phi = j * 2 * PI / (M - 1);
 
@@ -99,7 +96,7 @@ VOID MakeSphere( INT r )
 
 VOID DrawSphere( HDC hDC, INT x, INT y, INT r )
 {
-  DOUBLE t = clock() / (DOUBLE)CLOCKS_PER_SEC;
+  DOUBLE t = clock() / (DOUBLE)CLOCKS_PER_SEC, Sf;
   INT i, j;
   static POINT P[N][M];
 
@@ -113,24 +110,42 @@ VOID DrawSphere( HDC hDC, INT x, INT y, INT r )
     }
   }
 
-  for (i = 0; i < N; i++)
-  {
-    MoveToEx(hDC, P[i][0].x, P[i][0].y, 0);
-    for (j = 1; j < M; j++)
+  for (i = 0; i < N - 1; i++)
+    for (j = 0; j < M - 1; j++)
     {
-      LineTo(hDC, P[i][j].x, P[i][j].y);
-    }
-  }
+      POINT pts[4];
 
-  for (i = 0; i < M; i++)
-  {
-    MoveToEx(hDC, P[0][i].x, P[0][i].y, 0);
-    for (j = 1; j < N; j++)
-    {
-      LineTo(hDC, P[i][j].x, P[i][j].y);
-    }
-  }
+      pts[0] = P[i][j];
+      pts[1] = P[i][j + 1];
+      pts[2] = P[i + 1][j + 1];
+      pts[3] = P[i + 1][j];
 
+      Sf = (pts[0].x - pts[1].x) * (pts[1].y + pts[0].y) +
+        (pts[1].x - pts[2].x) * (pts[2].y + pts[1].y) +
+        (pts[2].x - pts[3].x) * (pts[3].y + pts[2].y) +
+        (pts[3].x - pts[0].x) * (pts[0].y + pts[3].y);
+      
+        if (Sf > 0)
+        {
+          SetDCPenColor(hDC, RGB(0, 0, 0));
+          SetDCBrushColor(hDC, RGB(150, 150, 0));
+          Polygon(hDC, pts, 4);
+        }
+        else
+        {
+          SetDCPenColor(hDC, RGB(0, 0, 0));
+          SetDCBrushColor(hDC, RGB(130, 130, 0));
+          Polygon(hDC, pts, 4);
+        }
+       
+      SetDCPenColor(hDC, RGB(0, 0, 0));
+      SetDCBrushColor(hDC, RGB(150, 150, 0));
+      Polygon(hDC, pts, 4);
+
+
+    }
+
+  
 }
 
 INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
@@ -171,21 +186,25 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
     return 0;
+
+  case WM_KEYDOWN:
+    if (wParam == VK_ESCAPE)
+      SendMessage(hWnd, WM_CLOSE, 0, 0);
  
   case WM_TIMER:
  
     SelectObject(hMemDC, GetStockObject(DC_BRUSH));
     SelectObject(hMemDC, GetStockObject(DC_PEN));
     SetDCPenColor(hMemDC, RGB(0, 0, 0));
-    SetDCBrushColor(hMemDC, RGB(255, 255, 255));
+    SetDCBrushColor(hMemDC, RGB(0, 0, 0));
     Rectangle(hMemDC, 0, 0, w, h);
 
     SelectObject(hMemDC, GetStockObject(DC_BRUSH));
     SelectObject(hMemDC, GetStockObject(DC_PEN));
-    SetDCPenColor(hMemDC, RGB(0, 0, 0));
+    SetDCPenColor(hMemDC, RGB(150, 150, 0));
     SetDCBrushColor(hMemDC, RGB(0, 0, 0));
-    MakeSphere(w / 4);
-    DrawSphere(hMemDC, w / 2, h / 2, w / 4);
+    MakeSphere(15);
+    DrawSphere(hMemDC, w / 2, h / 2, 20);
     InvalidateRect(hWnd, NULL, TRUE);
 
     return 0;

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="T08ANIM"
-	ProjectGUID="{1B31A85C-9EC2-4403-BFB0-8EF6FA9F27C3}"
-	RootNamespace="T08ANIM"
+	Name="T06DETG"
+	ProjectGUID="{2313EAC1-7DEC-448C-BCD3-DE101A3A99E6}"
+	RootNamespace="T06DETG"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -179,49 +179,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DEF.H"
+				RelativePath=".\T06DETG.C"
 				>
 			</File>
-			<File
-				RelativePath=".\MAIN.C"
-				>
-			</File>
-			<Filter
-				Name="MTH"
-				>
-				<File
-					RelativePath=".\MTH\VEC.H"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="ANIM"
-				>
-				<Filter
-					Name="RND"
-					>
-					<File
-						RelativePath=".\ANIM\RND\RND.H"
-						>
-					</File>
-					<File
-						RelativePath=".\ANIM\RND\RNDBASE.C"
-						>
-					</File>
-					<File
-						RelativePath=".\ANIM\RND\RNDDATA.C"
-						>
-					</File>
-					<File
-						RelativePath=".\ANIM\RND\RNDPRIM.C"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Windows Depended"
-				>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"

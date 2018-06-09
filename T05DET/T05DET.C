@@ -32,9 +32,11 @@ INT Go( INT pos )
 
 VOID Det( INT n, INT pr )
 {
+  INT i, j, sum;
+
   for (i = 0; i < n; i++)
   {
-    sum += A[i][j] * (pr * 2 - 1);
+    sum += A[i][j];
   }
 }
 

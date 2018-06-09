@@ -51,21 +51,55 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 }
 
 
-void DrawClock( HDC hDC, INT x, INT y, INT len )
+void DrawClock( HDC hDC, INT x, INT y, INT len, INT angle )
 {
   SYSTEMTIME tm;
-  static INT w, h;
+  static INT w, h, n, i, k;
+  POINT ptssec[3], ptsmin[3], ptsho[3];
 
   GetLocalTime(&tm);
 
-  MoveToEx(hDC, x, y, NULL);
-  LineTo(hDC, x + len * sin(tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000), y - len * cos(tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000));
+  ptssec[0].x = x;
+  ptssec[0].y = y;
 
-  MoveToEx(hDC, x, y, NULL);
-  LineTo(hDC, x + len * 2 / 3 * sin(tm.wMinute * PI / 30 + tm.wSecond * PI / 30000), y - len * 2 / 3 * cos(tm.wMinute * PI / 30 + tm.wSecond * PI / 30000));
+  ptssec[1].x = x + len * sin(tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000);
+  ptssec[1].y = y - len * cos(tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000);
 
-  MoveToEx(hDC, x, y, NULL);
-  LineTo(hDC, x + len / 3 * sin(tm.wHour * PI / 30 + tm.wMinute * PI / 30000), y - len / 3 * cos(tm.wHour * PI / 30 + tm.wMinute * PI / 30000));
+  ptssec[2].x = x + len * sin(angle * PI / 180 + tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000);
+  ptssec[2].y = y - len * cos(angle * PI / 180 + tm.wSecond * PI / 30 + tm.wMilliseconds * PI / 30000);
+
+  ptsmin[0].x = x;
+  ptsmin[0].y = y;
+
+  ptsmin[1].x = x + len * 2 / 3 * sin(tm.wMinute * PI / 30 + tm.wSecond * PI / 30000);
+  ptsmin[1].y = y - len * 2 / 3 * cos(tm.wMinute * PI / 30 + tm.wSecond * PI / 30000);
+
+  ptsmin[2].x = x + len * 2 / 3 * sin(angle * PI / 180 + tm.wMinute * PI / 30 + tm.wSecond * PI / 30000);
+  ptsmin[2].y = y - len * 2 / 3 * cos(angle * PI / 180 + tm.wMinute * PI / 30 + tm.wSecond * PI / 30000);
+
+  ptsho[0].x = x;
+  ptsho[0].y = y;
+
+  ptsho[1].x = x + len / 3 * sin(tm.wHour * PI / 6 + tm.wMinute * PI / 30000);
+  ptsho[1].y = y - len / 3 * cos(tm.wHour * PI / 6 + tm.wMinute * PI / 30000);
+
+  ptsho[2].x = x + len / 3 * sin(angle * PI / 180 + tm.wHour * PI / 6 + tm.wMinute * PI / 30000);
+  ptsho[2].y = y - len / 3 * cos(angle * PI / 180 + tm.wHour * PI / 6 + tm.wMinute * PI / 30000);
+
+  /* for (i = 0; i < n; i++)
+  {
+    pts1[i].x = x + pts[i].x * cos(angle * PI / 180) - pts[i].y * sin(angle * PI / 180);
+    pts1[i].y = y - pts[i].x * sin(angle * PI / 180) + pts[i].y * cos(angle * PI / 180);
+    for (k = i + 1; k < n; k++)
+    {
+      pts[k].x = pts1[i].x;
+      pts[k].y = pts1[i].y;
+    }
+  }  */
+
+  Polygon(hDC, ptssec, 3);
+  Polygon(hDC, ptsmin, 3);
+  Polygon(hDC, ptsho, 3);
 }                                                     
 
 INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
@@ -74,7 +108,7 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   static HDC hMemDC, hDCClock;
   static HBITMAP hBm, hBmClock;
   static HFONT hFnt;
-  INT l;
+  INT l, n;
   SIZE s;
   CHAR Buf[50];
   POINT pt;
@@ -98,6 +132,12 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 
     hBmClock = LoadImage(NULL, "CLOCKFACE.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     SelectObject(hDCClock, hBmClock);
+    
+    SelectObject(hMemDC, GetStockObject(DC_BRUSH));
+    SelectObject(hDC, GetStockObject(DC_BRUSH));
+
+    Rectangle(hDC, 0, 0, w, h);
+    SetDCBrushColor(hDC, RGB(200, 200, 255));
 
     SetTimer(hWnd, 15, 10, NULL);
 
@@ -112,6 +152,8 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     
     hDC = GetDC(hWnd);
     hBm = CreateCompatibleBitmap(hDC, w, h);
+  
+    SetDCBrushColor(hMemDC, RGB(200, 200, 255));
 
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
@@ -122,7 +164,7 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     GetObject(hBmClock, sizeof(BITMAP), &bm);
     BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight) / 2, bm.bmWidth, bm.bmHeight, hDCClock, 0, 0, SRCCOPY);
 
-    DrawClock(hMemDC, w / 2, h / 2, bm.bmWidth / 2);
+    DrawClock(hMemDC, w / 2, h / 2, bm.bmWidth / 2, 10);
 
     GetLocalTime(&tm);
     l = sprintf(Buf, "%02.i day, %02.i.%02.i.%02.i", tm.wDayOfWeek, tm.wHour, tm.wMinute, tm.wSecond);
@@ -135,6 +177,7 @@ INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
+
     BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
     EndPaint(hWnd, &ps);
 
