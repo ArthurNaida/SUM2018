@@ -1,14 +1,8 @@
-#ifndef __RND_H_ 
+#ifndef __RND_H_
 #define __RND_H_
 
-#include <windows.h>
 #include "../../def.h"
 
-
-extern HWND AN6_hWndRnd;
-extern HDC AN6_hDCRndFrame;
-extern HBITMAP AN6_hBmRndFrame;
-extern INT AN6_RndFrameW, AN6_RndFrameH;
 extern DBL AN6_RndProjSize, AN6_RndProjDist, AN6_RndProjFarClip;
 extern MATR  AN6_RndMatrView, AN6_RndMatrProj, AN6_RndMatrVP;
 
@@ -33,7 +27,12 @@ VOID AN6_RndStart( VOID );
 VOID AN6_RndEnd( VOID );
 VOID AN6_RndCopyFrame( HDC hDC );
 VOID AN6_RndProjSet( VOID );
-VOID VG4_RndCamSet( VEC Loc, VEC At, VEC Up1 );
+VOID AN6_RndCamSet( VEC Loc, VEC At, VEC Up1 );
+
+BOOL AN6_RndPrimCreate( an6PRIM *Pr, INT NoofV, INT NoofI );
+VOID AN6_RndPrimFree( an6PRIM *Pr );
+VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World );
+BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName );
 
 #endif 
 

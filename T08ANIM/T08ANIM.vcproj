@@ -66,7 +66,7 @@
 				AdditionalLibraryDirectories="X:\TGRKIT\LIB;$(DXSDK_DIR)Lib\0x86;$(OPENAL_DIR)Lib;"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -183,7 +183,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ANIM\INPUT.C"
+				>
+			</File>
+			<File
 				RelativePath=".\MAIN.C"
+				>
+			</File>
+			<File
+				RelativePath=".\UNITS.H"
 				>
 			</File>
 			<Filter
@@ -197,6 +205,30 @@
 			<Filter
 				Name="ANIM"
 				>
+				<File
+					RelativePath=".\ANIM\ANIM.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\ANIM.H"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\CONTROL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\TIME.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\U_COW.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\UNIT.C"
+					>
+				</File>
 				<Filter
 					Name="RND"
 					>

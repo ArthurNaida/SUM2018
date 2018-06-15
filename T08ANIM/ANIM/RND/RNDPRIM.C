@@ -1,7 +1,6 @@
-#include <windows.h>
-#include <stdlib.h>
-#include <string.h>
-#include "rnd.h"
+#include <stdio.h>
+
+#include "..\anim.h"
 
 BOOL AN6_RndPrimCreate( an6PRIM *Pr, INT NoofV, INT NoofI )
 {
@@ -11,7 +10,7 @@ BOOL AN6_RndPrimCreate( an6PRIM *Pr, INT NoofV, INT NoofI )
   memset(Pr, 0, sizeof(an6PRIM));
 
   /* Calculate memory size for primitive data */
-  size = sizeof(an6VERTEX) * NoofV + sizeof(INT) * NoofI;
+  size = sizeof(an6VERTEX) * NoofV + sizeof(INT) * NoofI * 3;
 
   /* Allocate memory */
   Pr->V = malloc(size);
@@ -41,7 +40,7 @@ VOID AN6_RndPrimFree( an6PRIM *Pr )
   memset(Pr, 0, sizeof(an6PRIM));
 } /* End of 'AN6_RndPrimFree' function */
 
-VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World );
+VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World )
 {
   INT i;
   POINT *pnts; /* vertex projections */
@@ -59,23 +58,23 @@ VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World );
     VEC p = VecMulMatr4x4(Pr->V[i].P, M);
 
     /* Convert from World to NDC */
-    pnts[i].x = (p.X + 1) * AN6_RndFrameW / 2;
-    pnts [i].y = (-p.Y + 1) * AN6_RndFrameH / 2;
+    pnts[i].x = (p.x + 1) * AN6_Anim.W / 2;
+    pnts[i].y = (-p.y + 1) * AN6_Anim.H / 2;
   }
 
   /* Draw all triangles */
-  for (i = 0; i < Pr->NumOfI; i += 3)
+  for (i = 0; i < Pr->NumOfI; i += 1)
   {
     POINT p[3];
 
-    p[0] = pnts[Pr->I[i]];
-    p[1] = pnts[Pr->I[i + 1]];
-    p[2] = pnts[Pr->I[i + 2]];
-    Polygon(AN6_hDCRndFrame, p, 3);
+    p[0] = pnts[Pr->I[i * 3]];
+    p[1] = pnts[Pr->I[i * 3 + 1]];
+    p[2] = pnts[Pr->I[i * 3 + 2]];
+    Polygon(AN6_Anim.hDC, p, 3);
   }
 
   free(pnts);
-} /* End of 'VG4_RndPrimDraw' function */
+} /* End of 'AN6_RndPrimDraw' function */
 
 BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName )
 {
@@ -112,7 +111,7 @@ BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName )
       DBL x, y, z;
 
       sscanf(Buf + 2, "%lf%lf%lf", &x, &y, &z);
-      Pr->V[nv++] = VecSet(x, y, z);
+      Pr->V[nv++].P = VecSet(x, y, z);
     }
     else if (Buf[0] == 'f' && Buf[1] == ' ')
     {
@@ -128,4 +127,4 @@ BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName )
     }
   fclose(F);
   return TRUE;
-} /* End of 'VG4_RndPrimLoad' function */
+} /* End of 'AN6_RndPrimLoad' function */

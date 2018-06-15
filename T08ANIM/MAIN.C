@@ -1,10 +1,7 @@
-#include <stdio.h>
-#include <windows.h>
-#include <math.h>
-#include <time.h>
-#include "anim\rnd\rnd.h"
-#define WND_CLASS_NAME "My window class"
+#include "units.h"
 
+#define WND_CLASS_NAME "My window class"
+INT AN6_MouseWheel;
 
 INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
@@ -38,7 +35,7 @@ VOID FlipFullScreen( HWND hWnd )
     AdjustWindowRect(&rc, GetWindowLong(hWnd, GWL_STYLE), FALSE);
 
     SetWindowPos(hWnd, HWND_TOP, rc.left, rc.top,
-      rc.right - rc.left, rc.bottom - rc.top, SWP_NOOWNERZORDER);
+    rc.right - rc.left, rc.bottom - rc.top, SWP_NOOWNERZORDER);
   }
 }
 
@@ -76,6 +73,9 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
+  AN6_AnimUnitAdd(AN6_UnitCreateCOW());
+  AN6_AnimUnitAdd(AN6_UnitCreateCONTROL());
+
   while (GetMessage(&msg, NULL, 0, 0))
   {
     TranslateMessage(&msg);
@@ -84,66 +84,53 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 
   return msg.wParam;
 }
-typedef struct
-{
-  DOUBLE x, y, z;
-} VECT;
 
 INT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  static INT w, h;
-  static HDC hMemDC;
-  static HBITMAP hBm;
-  static HFONT hFnt;
-  POINT pt;
   PAINTSTRUCT ps;
   HDC hDC;
-
-  GetCursorPos(&pt);
-  ScreenToClient(hWnd, &pt);
+  static an6PRIM Pr;
 
   switch (Msg)
   {
   case WM_CREATE:
-    AN6_RndInit();
-
+    AN6_AnimInit(hWnd);
+    SetTimer(hWnd, 15, 10, NULL);
     return 0;
   
-  case WM_SIZE:
+  case WM_SIZE: 
     AN6_RndResize(LOWORD(lParam), HIWORD(lParam));
-
-    return 0;
+    return 0;    
  
   case WM_TIMER:
-    AN6_RndStart();
-    AN6_RndEnd();
-
-    InvalidateRect(hWnd, NULL, TRUE);
-
+    AN6_AnimRender();
+    InvalidateRect(hWnd, NULL, FALSE);
     return 0;
   
   case WM_KEYDOWN:
-	  if (wParam == VK_SPACE || wParam == VK_ESCAPE)
+    if (wParam == VK_SPACE || wParam == VK_ESCAPE)
       SendMessage(hWnd, WM_CLOSE, 0, 0);
     else if (wParam == 'F')
       FlipFullScreen(hWnd);
-  
+    return 0;
+
+  case WM_MOUSEWHEEL:
+    AN6_MouseWheel += (SHORT)HIWORD(wParam);
+  return 0;
+
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
-    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+    AN6_AnimCopyFrame(hDC);
     EndPaint(hWnd, &ps);
-
     return 0;
 
   case WM_ERASEBKGND:
     return 1;
 
   case WM_DESTROY:
-    DeleteObject(hBm);
-    DeleteDC(hMemDC);
+    AN6_AnimClose();
     KillTimer(hWnd, 15);
     PostQuitMessage(0);
-
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
