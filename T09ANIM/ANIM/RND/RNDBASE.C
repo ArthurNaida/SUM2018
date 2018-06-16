@@ -2,35 +2,46 @@
 
 #pragma comment(lib, "opengl32")
 #pragma comment(lib, "glu32")
-#pragma comment(lib, "glew32s")
+/*#pragma comment(lib, "glew32s")  */
 
 VOID AN6_RndInit( HWND hWnd )
 { 
-  HDC hDC;
+  INT i;
+  PIXELFORMATDESCRIPTOR pfd = {0};
 
-  hDC = GetDC(AN6_Anim.hWnd);
-  AN6_Anim.hDC = CreateCompatibleDC(hDC);
-  ReleaseDC(AN6_Anim.hWnd, AN6_Anim.hDC);
+  /* Store window and context handles */
+  AN6_Anim.hWnd = hWnd;
+  AN6_Anim.hDC = GetDC(AN6_Anim.hWnd);
 
-  AN6_RndCamSet(VecSet(30, 30, 30), VecSet(0, 0, 0), VecSet(0, 1, 0));
+  /* OpenGL init: pixel format setup */
+  pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+  pfd.nVersion = 1;
+  pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL;
+  pfd.cColorBits = 32;
+  pfd.cDepthBits = 32;
+  i = ChoosePixelFormat(AN6_Anim.hDC, &pfd);
+  DescribePixelFormat(AN6_Anim.hDC, i, sizeof(pfd), &pfd);
+  SetPixelFormat(AN6_Anim.hDC, i, &pfd);
+
+  /* OpenGL init: setup rendering context */
+  AN6_Anim.hRC = wglCreateContext(AN6_Anim.hDC);
+  wglMakeCurrent(AN6_Anim.hDC, AN6_Anim.hRC);
+
+  /* Set default render parameters */
+  glClearColor(0.3, 0.5, 0.7, 1);
+  glEnable(GL_DEPTH_TEST);
 }
 
 VOID AN6_RndClose( VOID )
 {
-  DeleteObject(AN6_Anim.hBm);
-  DeleteObject(AN6_Anim.hDC);
+  wglMakeCurrent(NULL, NULL);
+  wglDeleteContext(AN6_Anim.hRC);
+  ReleaseDC(AN6_Anim.hWnd, AN6_Anim.hDC);
 }
 
 VOID AN6_RndResize( INT w, INT h )
 {
-  HDC hDC;
-
-  if (AN6_Anim.hBm != NULL)
-    DeleteObject(AN6_Anim.hBm);
-  hDC = GetDC(AN6_Anim.hWnd);
-  AN6_Anim.hBm = CreateCompatibleBitmap(hDC, w, h);
-  ReleaseDC(AN6_Anim.hWnd, hDC);
-  SelectObject(AN6_Anim.hDC, AN6_Anim.hBm);
+  glViewport(0, 0, w, h);
 
   AN6_Anim.W = w;
   AN6_Anim.H = h;
@@ -40,27 +51,22 @@ VOID AN6_RndResize( INT w, INT h )
 
 VOID AN6_RndStart( VOID )
 {
-  SelectObject(AN6_Anim.hDC, GetStockObject(WHITE_BRUSH));
-  SelectObject(AN6_Anim.hDC, GetStockObject(NULL_PEN));
+  /* Clear frame */
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  Rectangle(AN6_Anim.hDC, 0, 0, AN6_Anim.W, AN6_Anim.H);
-
-  SelectObject(AN6_Anim.hDC, GetStockObject(NULL_BRUSH));
-  SelectObject(AN6_Anim.hDC, GetStockObject(DC_PEN));
-
-  SetDCPenColor(AN6_Anim.hDC, RGB(0, 0, 0));
 }
 
 VOID AN6_RndEnd( VOID )
 {
+  glFinish();
 }
 
 VOID AN6_RndCopyFrame( HDC hDC )
 {
-  BitBlt(hDC, 0, 0, AN6_Anim.W, AN6_Anim.H, AN6_Anim.hDC, 0, 0, SRCCOPY);
+  SwapBuffers(AN6_Anim.hDC);
 }
 
-DBL AN6_RndProjSize = 0.1, AN6_RndProjDist = 0.1, AN6_RndProjFarClip = 300;
+DBL AN6_RndProjSize = 0.1, AN6_RndProjDist = 0.1, AN6_RndProjFarClip = 30000;
 MATR  AN6_RndMatrView, AN6_RndMatrProj, AN6_RndMatrVP;
 
 VOID AN6_RndProjSet( VOID )

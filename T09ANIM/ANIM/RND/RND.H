@@ -4,7 +4,7 @@
 #include "../../def.h"
 
 #define GLEW_STATIC
-#include <glew.h>
+/*#include <glew.h> */
 #include <gl/gl.h>
 #include <gl/glu.h>
 

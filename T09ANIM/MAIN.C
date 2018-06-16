@@ -41,6 +41,8 @@ VOID FlipFullScreen( HWND hWnd )
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd)
 {
+  INT i;
+
   WNDCLASS wc;
   HWND hWnd;
   MSG msg;
@@ -73,7 +75,9 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
-  AN6_AnimUnitAdd(AN6_UnitCreateCOW());
+  for (i = 0; i < 100; i++)
+    AN6_AnimUnitAdd(AN6_UnitCreateCOW());
+
   AN6_AnimUnitAdd(AN6_UnitCreateCONTROL());
 
   while (GetMessage(&msg, NULL, 0, 0))

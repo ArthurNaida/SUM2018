@@ -17,6 +17,7 @@ typedef struct tagan6ANIM
 {
   HWND hWnd;
   HDC hDC;
+  HGLRC hRC;
   INT W, H;
   an6UNIT *Units[AN6_MAX_UNITS];
   INT NumOfUnits;

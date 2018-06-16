@@ -13,7 +13,7 @@ typedef struct
 static VOID AN6_UnitInit( an6UNIT_COW *Uni, an6ANIM *Ani )
 {
   AN6_RndPrimLoad(&Uni->COW, "cow.object");
-  Uni->Pos = VecSet(2, 0, 2);
+  Uni->Pos = VecSet(2 + rand() % 700, rand() % 700, 2 + rand() % 700);
 } 
 
 static VOID AN6_UnitClose( an6UNIT_COW *Uni, an6ANIM *Ani )
@@ -28,9 +28,7 @@ static VOID AN6_UnitResponse( an6UNIT_COW *Uni, an6ANIM *Ani )
 static VOID AN6_UnitRender( an6UNIT_COW *Uni, an6ANIM *Ani )
 {
   
-
-  AN6_RndCamSet(VecSet(20, 25, 15), VecSet(0, 0, 0), VecSet(0, 1, 0));
-  AN6_RndPrimDraw(&Uni->COW, MatrMulMatr(MatrTranslate(VecSet(0, sin(Ani->Time) * 15, 0)), MatrRotateY(Ani->Time * 200)));
+  AN6_RndPrimDraw(&Uni->COW, MatrTranslate(Uni->Pos));
 }
 
 an6UNIT * AN6_UnitCreateCOW( VOID )

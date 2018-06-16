@@ -16,6 +16,18 @@ typedef struct TagMatr
   DBL M[4][4];
 } MATR;
 
+/* Plane vector representation type */
+typedef struct tagVEC2
+{
+  FLT X, Y; /* Vector components */
+} VEC2;
+
+/* 4-components vector representation type */
+typedef struct tagVEC4
+{
+  FLT X, Y, Z, W; /* Vector components */
+} VEC4;
+
 __inline VEC VecSet( DBL x, DBL y, DBL z)
 {
   VEC v;

@@ -43,38 +43,27 @@ VOID AN6_RndPrimFree( an6PRIM *Pr )
 VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World )
 {
   INT i;
-  POINT *pnts; /* vertex projections */
   MATR M = MatrMulMatr(MatrMulMatr(Pr->Trans, World), AN6_RndMatrVP);
 
-  /* Allocate memory for projections */
-  pnts = malloc(sizeof(POINT) * Pr->NumOfV);
-  if (pnts == NULL)
-    return;
-
-  /* Project all vertices */
-  for (i = 0; i < Pr->NumOfV; i++)
-  {
-    /* Convert from World to NDC */
-    VEC p = VecMulMatr4x4(Pr->V[i].P, M);
-
-    /* Convert from World to NDC */
-    pnts[i].x = (p.x + 1) * AN6_Anim.W / 2;
-    pnts[i].y = (-p.y + 1) * AN6_Anim.H / 2;
-  }
+  /* Set transform matrix */
+  glLoadMatrixd(M.M[0]);
 
   /* Draw all triangles */
-  for (i = 0; i < Pr->NumOfI; i += 1)
+  glBegin(GL_TRIANGLES);
+  for (i = 0; i < Pr->NumOfI;)
   {
-    POINT p[3];
-
-    p[0] = pnts[Pr->I[i * 3]];
-    p[1] = pnts[Pr->I[i * 3 + 1]];
-    p[2] = pnts[Pr->I[i * 3 + 2]];
-    Polygon(AN6_Anim.hDC, p, 3);
+    glVertex3dv(&Pr->V[Pr->I[i * 3]].P.x);
+    /*
+    glVertex3d(Pr->V[Pr->I[i]].P.X,
+               Pr->V[Pr->I[i]].P.Y,
+               Pr->V[Pr->I[i]].P.Z);
+    */
+    glVertex3dv(&Pr->V[Pr->I[i * 3 + 1]].P.x);
+    glVertex3dv(&Pr->V[Pr->I[i * 3 + 2]].P.x);
+    i++;
   }
-
-  free(pnts);
-} /* End of 'AN6_RndPrimDraw' function */
+  glEnd();/* End of 'AN6_RndPrimDraw' function */
+}
 
 BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName )
 {
