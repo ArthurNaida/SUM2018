@@ -26,11 +26,11 @@ typedef struct tagan6ANIM
   BYTE KeysOld[256];
   BYTE KeysClick[256];
   INT Mx, My, Mz, Mdx, Mdy, Mdz;
-  DBL GlobalTime; 
-  DBL GlobalDeltaTime; /* Global time and interframe interval */
-  DBL Time;
-  DBL DeltaTime;             /* Time with pause and interframe interval */
-  DBL FPS;   /* Frames per second value */
+  FLT GlobalTime; 
+  FLT GlobalDeltaTime; /* Global time and interframe interval */
+  FLT Time;
+  FLT DeltaTime;             /* Time with pause and interframe interval */
+  FLT FPS;   /* Frames per second value */
   BOOL IsPause;   /* Pause flag */
 
 } an6ANIM;

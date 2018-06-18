@@ -240,6 +240,18 @@
 						RelativePath=".\ANIM\RND\RNDPRIM.C"
 						>
 					</File>
+					<Filter
+						Name="RES"
+						>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDMTL.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDSHD.C"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter

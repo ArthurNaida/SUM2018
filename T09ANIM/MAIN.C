@@ -75,7 +75,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
-  for (i = 0; i < 100; i++)
+  for (i = 0; i < 1; i++)
     AN6_AnimUnitAdd(AN6_UnitCreateCOW());
 
   AN6_AnimUnitAdd(AN6_UnitCreateCONTROL());

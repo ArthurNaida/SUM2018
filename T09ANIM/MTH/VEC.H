@@ -5,15 +5,16 @@
 #define PI 3.14159265358979323846
 #define D2R(A) ((A) * (PI / 180))
 typedef DOUBLE DBL;
+typedef FLOAT FLT;
 
 typedef struct
 {
-  DBL x, y, z;
+  FLT x, y, z;
 } VEC;
 
 typedef struct TagMatr
 {
-  DBL M[4][4];
+  FLT M[4][4];
 } MATR;
 
 /* Plane vector representation type */
@@ -28,7 +29,7 @@ typedef struct tagVEC4
   FLT X, Y, Z, W; /* Vector components */
 } VEC4;
 
-__inline VEC VecSet( DBL x, DBL y, DBL z)
+__inline VEC VecSet( FLT x, FLT y, FLT z)
 {
   VEC v;
   v.x = x;
@@ -70,7 +71,7 @@ __inline VEC VecMulNum( VEC v1, INT i )
   return v;
 }
 
-__inline VEC VecDivNum( VEC v, DBL i )
+__inline VEC VecDivNum( VEC v, FLT i )
 {
   if (i != 0)
   {
@@ -81,9 +82,9 @@ __inline VEC VecDivNum( VEC v, DBL i )
   return v;
 }
 
-__inline DBL VecDotVec( VEC v1, VEC v2 )
+__inline FLT VecDotVec( VEC v1, VEC v2 )
 {
-  DBL v;
+  FLT v;
 
   v = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 
@@ -101,28 +102,50 @@ __inline VEC VecCrossVec( VEC v1, VEC v2 )
   return v;
 }
 
-__inline DBL VecLen( VEC v1 )
+__inline FLT VecLen( VEC v1 )
 {
-  DBL len = sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
+  FLT len = sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
 
   return len;
 }
 
-__inline DBL VecLen2( VEC v1 )
+__inline FLT VecLen2( VEC v1 )
 {
-  DBL len2 = v1.x * v1.x + v1.y * v1.y + v1.z * v1.z;
+  FLT len2 = v1.x * v1.x + v1.y * v1.y + v1.z * v1.z;
 
   return len2;
 }
 
 __inline VEC VecNormalize( VEC v1 )
 {
-  DBL len = VecLen(v1);
+  FLT len = VecLen(v1);
 
   if (len == 0 || len == 1)
     return v1;
   
   return VecDivNum(v1, len);
+}
+
+__inline VEC VectorTransform( VEC v, MATR m )
+{
+  FLT x = 0, y = 0, z = 0;
+
+  x = v.x * m.M[0][0] + v.y * m.M[1][0] + v.z * m.M[2][0];
+  y = v.x * m.M[0][1] + v.y * m.M[1][1] + v.z * m.M[2][1];
+  z = v.x * m.M[0][2] + v.y * m.M[1][2] + v.z * m.M[2][2];
+
+  return VecSet(x, y, z);
+}
+
+__inline VEC PointTransform( VEC v, MATR m )
+{
+  FLT x, y, z;
+
+  x = v.x * m.M[0][0] + v.y * m.M[1][0] + v.z * m.M[2][0] + m.M[3][0];
+  y = v.x * m.M[0][1] + v.y * m.M[1][1] + v.z * m.M[2][1] + m.M[3][0];
+  z = v.x * m.M[0][2] + v.y * m.M[1][2] + v.z * m.M[2][2] + m.M[3][0];
+
+  return VecSet(x, y, z);
 }
 
 static MATR UnitMatrix =
@@ -161,9 +184,9 @@ __inline MATR MatrScale( VEC S )
 
   return M;
 }
-__inline MATR MatrRotateX( DBL AngleInDegree )
+__inline MATR MatrRotateX( FLT AngleInDegree )
 {
-  DBL a = D2R(AngleInDegree), si = sin(a), co = cos(a);
+  FLT a = D2R(AngleInDegree), si = sin(a), co = cos(a);
   MATR M = 
   {
     {
@@ -177,9 +200,9 @@ __inline MATR MatrRotateX( DBL AngleInDegree )
   return M;
 }
 
-__inline MATR MatrRotateY( DBL AngleInDegree )
+__inline MATR MatrRotateY( FLT AngleInDegree )
 {
-  DBL a = D2R(AngleInDegree), si = sin(a), co = cos(a);
+  FLT a = D2R(AngleInDegree), si = sin(a), co = cos(a);
   MATR M = 
   {
     {
@@ -192,9 +215,9 @@ __inline MATR MatrRotateY( DBL AngleInDegree )
 
   return M;
 }
-__inline MATR MatrRotateZ( DBL AngleInDegree )
+__inline MATR MatrRotateZ( FLT AngleInDegree )
 {
-  DBL a = D2R(AngleInDegree), si = sin(a), co = cos(a);
+  FLT a = D2R(AngleInDegree), si = sin(a), co = cos(a);
   MATR M = 
   {
     {
@@ -208,9 +231,9 @@ __inline MATR MatrRotateZ( DBL AngleInDegree )
   return M;
 }
 
-__inline MATR MatrRotate( DBL AngleInDegree, VEC V )
+__inline MATR MatrRotate( FLT AngleInDegree, VEC V )
 {
-  DBL A = D2R(AngleInDegree), si = sin(A), co = cos(A);
+  FLT A = D2R(AngleInDegree), si = sin(A), co = cos(A);
   MATR M =
   {
     {
@@ -249,13 +272,13 @@ __inline MATR MatrTranspose( MATR M )
 }
 
 
-__inline DBL MatrDeterm3x3( DBL A11, DBL A12, DBL A13, DBL A21, DBL A22, DBL A23, DBL A31, DBL A32, DBL A33 )
+__inline FLT MatrDeterm3x3( FLT A11, FLT A12, FLT A13, FLT A21, FLT A22, FLT A23, FLT A31, FLT A32, FLT A33 )
 {
   return A11 * A22 * A33 - A11 * A23 * A32 - A12 * A21 * A33 + 
          A12 * A23 * A31 + A13 * A21 * A32 - A13 * A22 * A31;
 }
 
-__inline DBL MatrDeterm( MATR M )
+__inline FLT MatrDeterm( MATR M )
 {
   return
     M.M[0][0] * MatrDeterm3x3(M.M[1][1], M.M[1][2], M.M[1][3],
@@ -274,7 +297,7 @@ __inline DBL MatrDeterm( MATR M )
 __inline MATR MatrInverse( MATR M )
 {
   MATR r;
-  DBL det = MatrDeterm(M);
+  FLT det = MatrDeterm(M);
 
   if (det == 0)
     return UnitMatrix;
@@ -386,7 +409,7 @@ __inline MATR MatrView( VEC Loc, VEC At, VEC Up1)
   return m;
 }
 
-__inline MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n, DBL f )
+__inline MATR MatrFrustum( FLT l, FLT r, FLT b, FLT t, FLT n, FLT f )
 {
   MATR m =
   {
@@ -403,7 +426,7 @@ __inline MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n, DBL f )
 
 __inline VEC VecMulMatr4x4( VEC V, MATR M )
 {
-  DBL w = V.x * M.M[0][3] + V.y * M.M[1][3] + V.z * M.M[2][3] + M.M[3][3];
+  FLT w = V.x * M.M[0][3] + V.y * M.M[1][3] + V.z * M.M[2][3] + M.M[3][3];
 
   return VecSet((V.x * M.M[0][0] + V.y * M.M[1][0] + V.z * M.M[2][0] + M.M[3][0]) / w,
                 (V.x * M.M[0][1] + V.y * M.M[1][1] + V.z * M.M[2][1] + M.M[3][1]) / w,

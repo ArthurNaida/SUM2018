@@ -2,7 +2,7 @@
 
 #pragma comment(lib, "opengl32")
 #pragma comment(lib, "glu32")
-/*#pragma comment(lib, "glew32s")  */
+#pragma comment(lib, "glew32s")
 
 VOID AN6_RndInit( HWND hWnd )
 { 
@@ -26,6 +26,11 @@ VOID AN6_RndInit( HWND hWnd )
   /* OpenGL init: setup rendering context */
   AN6_Anim.hRC = wglCreateContext(AN6_Anim.hDC);
   wglMakeCurrent(AN6_Anim.hDC, AN6_Anim.hRC);
+
+  if (glewInit() != GLEW_OK)
+    exit(0);
+  if (!(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader))
+    exit(0);
 
   /* Set default render parameters */
   glClearColor(0.3, 0.5, 0.7, 1);
@@ -51,9 +56,15 @@ VOID AN6_RndResize( INT w, INT h )
 
 VOID AN6_RndStart( VOID )
 {
+  static DBL ReloadTime = 0;
+
+  if (AN6_Anim.GlobalTime - ReloadTime > 3)
+  {
+    AN6_RndShdUpdate();
+    ReloadTime = AN6_Anim.GlobalTime;
+  }
   /* Clear frame */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 }
 
 VOID AN6_RndEnd( VOID )
@@ -66,18 +77,18 @@ VOID AN6_RndCopyFrame( HDC hDC )
   SwapBuffers(AN6_Anim.hDC);
 }
 
-DBL AN6_RndProjSize = 0.1, AN6_RndProjDist = 0.1, AN6_RndProjFarClip = 30000;
+FLT AN6_RndProjSize = 0.1, AN6_RndProjDist = 0.1, AN6_RndProjFarClip = 30000;
 MATR  AN6_RndMatrView, AN6_RndMatrProj, AN6_RndMatrVP;
 
 VOID AN6_RndProjSet( VOID )
 {
-  DBL ratio_x, ratio_y;
+  FLT ratio_x, ratio_y;
 
   ratio_x = ratio_y = AN6_RndProjSize / 2;
   if (AN6_Anim.W > AN6_Anim.H) 
-    ratio_x *= (DBL)AN6_Anim.W / AN6_Anim.H;
+    ratio_x *= (FLT)AN6_Anim.W / AN6_Anim.H;
   else
-    ratio_y *= (DBL)AN6_Anim.H / AN6_Anim.W;
+    ratio_y *= (FLT)AN6_Anim.H / AN6_Anim.W;
 
   AN6_RndMatrProj = MatrFrustum(-ratio_x, ratio_x, -ratio_y, ratio_y, AN6_RndProjDist, AN6_RndProjFarClip);
   AN6_RndMatrVP = MatrMulMatr(AN6_RndMatrView, AN6_RndMatrProj);

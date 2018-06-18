@@ -29,8 +29,8 @@ VOID AN6_TimerResponse( VOID )
 
   QueryPerformanceCounter(&t);
   /* Global time */
-  AN6_Anim.GlobalTime = (DBL)(t.QuadPart - StartTime) / TimePerSec;
-  AN6_Anim.GlobalDeltaTime = (DBL)(t.QuadPart - OldTime) / TimePerSec;
+  AN6_Anim.GlobalTime = (FLT)(t.QuadPart - StartTime) / TimePerSec;
+  AN6_Anim.GlobalDeltaTime = (FLT)(t.QuadPart - OldTime) / TimePerSec;
 
   /* Time with pause */
   if (AN6_Anim.IsPause)
@@ -41,13 +41,13 @@ VOID AN6_TimerResponse( VOID )
   else
   {
     AN6_Anim.DeltaTime = AN6_Anim.GlobalDeltaTime;
-    AN6_Anim.Time = (DBL)(t.QuadPart - PauseTime - StartTime) / TimePerSec;
+    AN6_Anim.Time = (FLT)(t.QuadPart - PauseTime - StartTime) / TimePerSec;
   }
   /* FPS */
   FrameCounter++;
   if (t.QuadPart - OldTimeFPS > TimePerSec)
   {
-    AN6_Anim.FPS = FrameCounter * TimePerSec / (DBL)(t.QuadPart - OldTimeFPS);
+    AN6_Anim.FPS = FrameCounter * TimePerSec / (FLT)(t.QuadPart - OldTimeFPS);
     OldTimeFPS = t.QuadPart;
     FrameCounter = 0;
   }

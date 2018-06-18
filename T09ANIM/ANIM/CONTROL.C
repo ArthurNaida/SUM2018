@@ -6,13 +6,13 @@ typedef struct tagan6UNIT_CONTROL
   VEC CamLoc;
   VEC CamAt;
   VEC CamDir;
-  DBL Speed;
+  FLT Speed;
 } an6UNIT_CONTROL;
 
 static VOID AN6_UnitInit( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
 {
-  Uni->CamLoc = VecSet(20, 25, 15);
-  Uni->CamAt = VecSet(0, 0, 0);
+  Uni->CamLoc = VecSet(1, 10, -30);
+  Uni->CamAt = VecSet(0, 10, 0);
   Uni->CamDir = VecSet(0, 1, 0);
 } 
 
@@ -25,18 +25,19 @@ static VOID AN6_UnitResponse( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
 
-   Uni->CamLoc =
-    VecAddVec(Uni->CamLoc,
-      VecMulNum(Uni->CamDir, 30 *
-        (Ani->Keys[VK_UP] - Ani->Keys[VK_DOWN])));
   if (Ani->Keys[VK_LBUTTON])
   {
-    Uni->CamAt = VecAddVec(Uni->CamAt, VecSet(AN6_Anim.Mdx, AN6_Anim.Mdy, 0));
-    Uni->CamLoc = VecAddVec(Uni->CamLoc, VecSet(AN6_Anim.Mdx, AN6_Anim.Mdy, 0));
+    Uni->CamLoc =
+      PointTransform(Uni->CamLoc, MatrRotateY(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdx));
+    Uni->CamAt =
+      PointTransform(Uni->CamAt, MatrRotateY(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdx));
+    Uni->CamLoc =
+      PointTransform(Uni->CamLoc, MatrRotateX(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdy));
   }
-    AN6_RndCamSet(Uni->CamLoc, Uni->CamAt, Uni->CamDir);
+  AN6_RndCamSet(Uni->CamLoc, Uni->CamAt, Uni->CamDir);
+  
     
-} 
+}
 
 static VOID AN6_UnitRender( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
 {
