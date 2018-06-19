@@ -35,6 +35,9 @@ VOID AN6_RndInit( HWND hWnd )
   /* Set default render parameters */
   glClearColor(0.3, 0.5, 0.7, 1);
   glEnable(GL_DEPTH_TEST);
+
+  AN6_RndMtlInit();
+  AN6_RndShdInit();
 }
 
 VOID AN6_RndClose( VOID )

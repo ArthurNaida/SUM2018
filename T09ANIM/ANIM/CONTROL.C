@@ -5,7 +5,7 @@ typedef struct tagan6UNIT_CONTROL
   UNIT_BASE_FIELDS;
   VEC CamLoc;
   VEC CamAt;
-  VEC CamDir;
+  VEC CamUp;
   FLT Speed;
 } an6UNIT_CONTROL;
 
@@ -13,7 +13,7 @@ static VOID AN6_UnitInit( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
 {
   Uni->CamLoc = VecSet(1, 10, -30);
   Uni->CamAt = VecSet(0, 10, 0);
-  Uni->CamDir = VecSet(0, 1, 0);
+  Uni->CamUp = VecSet(0, 1, 0);
 } 
 
 static VOID AN6_UnitClose( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
@@ -22,21 +22,30 @@ static VOID AN6_UnitClose( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
 
 static VOID AN6_UnitResponse( an6UNIT_CONTROL *Uni, an6ANIM *Ani )
 {
+  VEC Sub, Sub1;
+
   if (Ani->Keys[VK_SHIFT] && Ani->KeysClick['P'])
     Ani->IsPause = !Ani->IsPause;
 
   if (Ani->Keys[VK_LBUTTON])
   {
-    Uni->CamLoc =
-      PointTransform(Uni->CamLoc, MatrRotateY(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdx));
     Uni->CamAt =
-      PointTransform(Uni->CamAt, MatrRotateY(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdx));
-    Uni->CamLoc =
-      PointTransform(Uni->CamLoc, MatrRotateX(-30 * Ani->GlobalDeltaTime * AN6_Anim.Mdy));
+      VecAddVec(Uni->CamLoc, VectorTransform(VecSubVec(Uni->CamAt, Uni->CamLoc),
+        MatrRotate(10 * Ani->GlobalDeltaTime * AN6_Anim.Mdy, VecNormalize(VecCrossVec(VecSubVec(Uni->CamAt, Uni->CamLoc), VecSet(0, 1, 0))))));
+    Uni->CamAt =
+      VecAddVec(Uni->CamLoc, VectorTransform(VecSubVec(Uni->CamAt, Uni->CamLoc), MatrRotateY(-10 * Ani->GlobalDeltaTime * AN6_Anim.Mdx)));
   }
-  AN6_RndCamSet(Uni->CamLoc, Uni->CamAt, Uni->CamDir);
-  
-    
+   
+  Sub =     
+    VecMulNum(VecSubVec(Uni->CamAt, Uni->CamLoc), 10 * Ani->GlobalDeltaTime * (Ani->Keys['W'] - Ani->Keys['S']));
+  Sub1 =
+    PointTransform(VecMulNum(VecSubVec(Uni->CamAt, Uni->CamLoc), -10 * Ani->GlobalDeltaTime * (Ani->Keys['D'] - Ani->Keys['A'])), MatrRotateY(90));
+  Uni->CamLoc = 
+    VecAddVec(VecAddVec(Uni->CamLoc, Sub), Sub1);
+  Uni->CamAt = 
+    VecAddVec(VecAddVec(Uni->CamAt, Sub), Sub1);
+
+    AN6_RndCamSet(Uni->CamLoc, Uni->CamAt, Uni->CamUp);
 }
 
 static VOID AN6_UnitRender( an6UNIT_CONTROL *Uni, an6ANIM *Ani )

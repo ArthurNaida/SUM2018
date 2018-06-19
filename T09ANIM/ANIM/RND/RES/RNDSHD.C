@@ -44,7 +44,7 @@ static VOID AN6_RndShdLog( CHAR *Prefix, CHAR *Type, CHAR *Text )
 {
   FILE *F;
 
-  if ((F = fopen("BIN/SHADERS/DEFAULT", "a")) == NULL)
+  if ((F = fopen("BIN/SHADERS/AN6_SHD.LOG", "a")) == NULL)
     return;
   fprintf(F, "%s/%s.GLSL:\n%s\n", Prefix, Type, Text);
   fclose(F);

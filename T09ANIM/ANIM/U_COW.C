@@ -13,7 +13,7 @@ typedef struct
 static VOID AN6_UnitInit( an6UNIT_COW *Uni, an6ANIM *Ani )
 {
   AN6_RndPrimLoad(&Uni->COW, "bin/models/cow.object");
-  Uni->Pos = VecSet(0, 0, 0);
+  Uni->Pos = VecSet(0 + rand() % 100, 0 + rand() % 100, 0 + rand() % 100);
 } 
 
 static VOID AN6_UnitClose( an6UNIT_COW *Uni, an6ANIM *Ani )

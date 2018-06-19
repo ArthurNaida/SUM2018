@@ -60,7 +60,7 @@ __inline VEC VecSubVec(VEC v1, VEC v2)
   return v;
 }
 
-__inline VEC VecMulNum( VEC v1, INT i )
+__inline VEC VecMulNum( VEC v1, FLT i )
 {
   VEC v;
 

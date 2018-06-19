@@ -27,12 +27,12 @@ VOID AN6_AnimRender( VOID )
 
   AN6_AnimKeyboardResponse();
   AN6_AnimMouseResponse();
+  AN6_TimerResponse();
 
   for (i = 0; i < AN6_Anim.NumOfUnits; i++)
     AN6_Anim.Units[i]->Response(AN6_Anim.Units[i], &AN6_Anim);
 
   AN6_RndStart();
-  AN6_TimerResponse();
 
   for (i = 0; i < AN6_Anim.NumOfUnits; i++)
     AN6_Anim.Units[i]->Render(AN6_Anim.Units[i], &AN6_Anim);

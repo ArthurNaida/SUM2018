@@ -64,20 +64,23 @@ VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World )
   INT AN6_RndProgId;
   INT loc;
   INT gl_prim_type;
-  MATR M = MatrMulMatr(MatrMulMatr(Pr->Trans, World), AN6_RndMatrVP);
-  MATR WVP;
+  MATR WVP = MatrMulMatr(World, MatrMulMatr(AN6_RndMatrView, AN6_RndMatrProj));
 
   /* Set transform matrix */
-  glLoadMatrixf(M.M[0]);
+  glLoadMatrixf(WVP.M[0]);
+
+  /* Apply material */
+  AN6_RndProgId = AN6_RndMtlApply(Pr->MtlNo);
+
+  if ((loc = glGetUniformLocation(AN6_RndProgId, "MatrWVP")) != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, WVP.M[0]);
+  if ((loc = glGetUniformLocation(AN6_RndProgId, "Time")) != -1)
+    glUniform1f(loc, AN6_Anim.Time);
 
   glEnable(GL_PRIMITIVE_RESTART);
   glPrimitiveRestartIndex(-1);
 
   gl_prim_type = Pr->Type == AN6_RND_PRIM_TRIMESH ? GL_TRIANGLES : GL_TRIANGLE_STRIP;
-  /* gl_prim_type = GL_POINTS; */
-
-  glPointSize(3);
-
   glBindVertexArray(Pr->VA);
   if (Pr->IBuf == 0)
     glDrawArrays(gl_prim_type, 0, Pr->NumOfI);
@@ -87,25 +90,7 @@ VOID AN6_RndPrimDraw( an6PRIM *Pr, MATR World )
     glDrawElements(gl_prim_type, Pr->NumOfI, GL_UNSIGNED_INT, NULL);
   }
   glBindVertexArray(0);
-
-  WVP = MatrMulMatr(World, MatrMulMatr(AN6_RndMatrView, AN6_RndMatrProj));
-  glLoadMatrixf(WVP.M[0]);
-  AN6_RndProgId = AN6_RndMtlApply(Pr->MtlNo);
-
-  glUseProgram(AN6_RndProgId);
-
-  if ((loc = glGetUniformLocation(AN6_RndProgId, "MatrWVP")) != -1)
-    glUniformMatrix4fv(loc, 1, FALSE, WVP.M[0]);
-  if ((loc = glGetUniformLocation(AN6_RndProgId, "Time")) != -1)
-    glUniform1f(loc, AN6_Anim.Time);
-
-  glBindVertexArray(Pr->VA);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Pr->IBuf);
-  glDrawElements(GL_TRIANGLES, Pr->NumOfI, GL_UNSIGNED_INT, NULL);
-  glBindVertexArray(0);
-
   glUseProgram(0);
-  glEnd();/* End of 'AN6_RndPrimDraw' function */
 }
 
 BOOL AN6_RndPrimLoad( an6PRIM *Pr, CHAR *FileName )

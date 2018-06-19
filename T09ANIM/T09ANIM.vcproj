@@ -233,22 +233,30 @@
 						>
 					</File>
 					<File
-						RelativePath=".\ANIM\RND\RNDDATA.C"
+						RelativePath=".\ANIM\RND\RNDPRIM.C"
 						>
 					</File>
 					<File
-						RelativePath=".\ANIM\RND\RNDPRIM.C"
+						RelativePath=".\ANIM\RND\RNDPRIMS.C"
 						>
 					</File>
 					<Filter
 						Name="RES"
 						>
 						<File
+							RelativePath=".\ANIM\RND\RES\RNDIMG.C"
+							>
+						</File>
+						<File
 							RelativePath=".\ANIM\RND\RES\RNDMTL.C"
 							>
 						</File>
 						<File
 							RelativePath=".\ANIM\RND\RES\RNDSHD.C"
+							>
+						</File>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDTEX.C"
 							>
 						</File>
 					</Filter>
