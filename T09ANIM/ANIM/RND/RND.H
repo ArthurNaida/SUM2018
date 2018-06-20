@@ -22,17 +22,22 @@ extern MATR  AN6_RndMatrView, AN6_RndMatrProj, AN6_RndMatrVP;
 typedef struct tagan6VERTEX
 {
   VEC P;  /* Vertex position */
+  VEC2 T; /* Vertex texture coordinates */
+  VEC N;  /* Vertex normal */
+  VEC4 C; /* Vertex color */
+
 } an6VERTEX;
 
 typedef enum tagan6PRIM_TYPE
 {
-  AN6_RND_PRIM_TRIMESH, AN6_RND_PRIM_FRID
+  AN6_RND_PRIM_TRIMESH, AN6_RND_PRIM_FRID,
+  AN6_RND_PRIM_GRID
 } an6PRIM_TYPE;
 
 typedef struct tagan6PRIM
 {
   an6PRIM_TYPE Type; /* Primitive type */
-  an6VERTEX *V; /* Vertex attributes array */
+ 
   INT NumOfV;   /* Number of vertices */
   INT VA;
   INT VBuf;
@@ -90,6 +95,13 @@ typedef struct tagan6TEXTURE
   UINT TexId;                        /* OpenGL texture Id */ 
 } an6TEXTURE;
 
+/* Grid topology representation type */
+typedef struct tagan6GRID
+{
+  INT W, H;     /* Grid size in vertex */
+  an6VERTEX *V; /* Grid vertex array */
+} an6GRID;
+
 extern an6TEXTURE AN6_RndTextures[AN6_MAX_TEXTURES];
 extern an6MATERIAL AN6_RndMaterials[AN6_MAX_MATERIALS];
 
@@ -136,6 +148,13 @@ VOID AN6_RndImgFree( an6IMAGE *Img );
 VOID AN6_RndImgToTex( an6IMAGE *Img );
 DWORD AN6_RndImgGet( an6IMAGE *Img, INT X, INT Y );
 
+VOID AN6_RndPrimFromGrid( an6PRIM *Pr, an6GRID *G );
+BOOL AN6_RndGridCreate( an6GRID *G, INT W, INT H );
+VOID AN6_RndGridFree( an6GRID *G );
+VOID AN6_RndPrimGridEvalNormals( an6GRID *G );
+BOOL AN6_RndGridCreateSphere( an6GRID *G, INT W, INT H, VEC C, FLT R );
+BOOL AN6_RndGridCreatePlane( an6GRID *G, INT W, INT H, VEC P, VEC Du, VEC Dv, FLT Tx, FLT Ty );
+BOOL AN6_RndGridCreateHeightField( an6GRID *G, CHAR *HeightFieldFileName, VEC P, VEC Du, VEC Dv, FLT Scale );
 
 #endif 
 

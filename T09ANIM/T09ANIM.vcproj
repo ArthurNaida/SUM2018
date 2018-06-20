@@ -214,7 +214,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\ANIM\U_COW.C"
+					RelativePath=".\ANIM\U_GROUND.C"
+					>
+				</File>
+				<File
+					RelativePath=".\ANIM\U_HELICOPTER.C"
 					>
 				</File>
 				<File
@@ -243,6 +247,10 @@
 					<Filter
 						Name="RES"
 						>
+						<File
+							RelativePath=".\ANIM\RND\RES\RNDGRID.C"
+							>
+						</File>
 						<File
 							RelativePath=".\ANIM\RND\RES\RNDIMG.C"
 							>

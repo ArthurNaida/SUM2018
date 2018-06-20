@@ -49,7 +49,7 @@ VOID AN6_RndPrimsDraw( an6PRIMS *Prs, MATR World )
   INT i;
   INT AN6_RndPrimAddons[2];
 
-  World = MatrMulMatr(Prs->Trans, World);
+ // World = MatrMulMatr(MatrMulMatr(Prs->Trans, World), MatrRotateY(AN6_Anim.GlobalTime * 5));
   AN6_RndPrimAddons[0] = Prs->NumOfPrims;
 
   /* Output non-transparent primitves */
@@ -58,7 +58,11 @@ VOID AN6_RndPrimsDraw( an6PRIMS *Prs, MATR World )
         AN6_RndMaterials[Prs->Prims[i].MtlNo].Trans >= 1)
     {
       AN6_RndPrimAddons[1] = i;
-      AN6_RndPrimDraw(&Prs->Prims[i], World);
+      
+      if (i == 7 || i == 9)
+        AN6_RndPrimDraw(&Prs->Prims[i], MatrMulMatr(World, MatrRotateY(AN6_Anim.Time * 1000)));
+      else
+        AN6_RndPrimDraw(&Prs->Prims[i], World);
     }
 
   /* Output transparent primitves */
@@ -70,7 +74,6 @@ VOID AN6_RndPrimsDraw( an6PRIMS *Prs, MATR World )
         AN6_RndMaterials[Prs->Prims[i].MtlNo].Trans < 1)
     {
       AN6_RndPrimAddons[1] = i;
-      AN6_RndPrimDraw(&Prs->Prims[i], World);
     }
   /* Front face */
   glCullFace(GL_BACK);
@@ -79,10 +82,9 @@ VOID AN6_RndPrimsDraw( an6PRIMS *Prs, MATR World )
         AN6_RndMaterials[Prs->Prims[i].MtlNo].Trans < 1)
     {
       AN6_RndPrimAddons[1] = i;
-      AN6_RndPrimDraw(&Prs->Prims[i], World);
     }
   glDisable(GL_CULL_FACE);
-} /* End of 'VG4_RndPrimsDraw' function */  
+} /* End of 'AN6_RndPrimsDraw' function */  
 
 /* Load array of primitives from G3DM file function.
  * ARGUMENTS:
@@ -169,6 +171,7 @@ BOOL AN6_RndPrimsLoad( an6PRIMS *Prs, CHAR *FileName )
     /* Add a new primitive */
     AN6_RndPrimCreate(&Prs->Prims[p], AN6_RND_PRIM_TRIMESH,
       V, NoofV, I, NoofI);
+    Prs->Prims[p].MtlNo = MtlNo;
   }
 
   /* Store first material number */

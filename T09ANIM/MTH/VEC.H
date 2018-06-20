@@ -7,7 +7,7 @@
 typedef DOUBLE DBL;
 typedef FLOAT FLT;
 
-typedef struct
+typedef struct tagVEC
 {
   FLT x, y, z;
 } VEC;
@@ -20,13 +20,13 @@ typedef struct TagMatr
 /* Plane vector representation type */
 typedef struct tagVEC2
 {
-  FLT X, Y; /* Vector components */
+  FLT x, y; /* Vector components */
 } VEC2;
 
 /* 4-components vector representation type */
 typedef struct tagVEC4
 {
-  FLT X, Y, Z, W; /* Vector components */
+  FLT x, y, z, w; /* Vector components */
 } VEC4;
 
 __inline VEC VecSet( FLT x, FLT y, FLT z)
@@ -35,6 +35,24 @@ __inline VEC VecSet( FLT x, FLT y, FLT z)
   v.x = x;
   v.y = y;
   v.z = z;
+  return v;
+}
+
+__inline VEC2 Vec2Set( FLT x, FLT y )
+{
+  VEC2 v;
+  v.x = x;
+  v.y = y;
+  return v;
+}
+
+__inline VEC4 Vec4Set( FLT x, FLT y, FLT z, FLT w )
+{
+  VEC4 v;
+  v.x = x;
+  v.y = y;
+  v.z = z;
+  v.w = w;
   return v;
 }
 

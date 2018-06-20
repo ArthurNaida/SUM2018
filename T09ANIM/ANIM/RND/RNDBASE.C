@@ -33,7 +33,7 @@ VOID AN6_RndInit( HWND hWnd )
     exit(0);
 
   /* Set default render parameters */
-  glClearColor(0.3, 0.5, 0.7, 1);
+  glClearColor(0.8, 0.7, 1, 1);
   glEnable(GL_DEPTH_TEST);
 
   AN6_RndMtlInit();

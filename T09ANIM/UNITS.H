@@ -3,7 +3,7 @@
 
 #include "anim\anim.h"
 
-an6UNIT * AN6_UnitCreateCOW( VOID );
+an6UNIT * AN6_UnitCreateHELICOPTER( VOID );
 an6UNIT * AN6_UnitCreateCONTROL( VOID );
 
 #endif 
